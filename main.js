@@ -28,44 +28,35 @@ const userTo = 'zzz.kasper.zzz.1995@gmail.com';
 
     const item = linksPage[0]
     // linksPage.forEach(async (item) => {
-    const pageItem = await browser.newPage()
-    await pageItem.goto(item.href)
-    await sleep(1000)
 
-    const products = await pageItem.$$('tbody > tr')
+    let isPars = true
+    let n = 1
+    do {
+        const pageItem = await browser.newPage()
+        const params = `?tv=1&p=${n}`
+        await pageItem.goto(item.href + params)
+        console.log(`n=${n} href='${item.href + params}'`)
+        await sleep(1000)
 
-    /* products.forEach(async (product) => {
-        const td = await product.$$('td')
-        const a = await td[0].$('a')
-        const href = await (await a.getProperty('href')).jsonValue()
-        console.log(href)
-    }) */
+        const products = await pageItem.$$('tbody > tr')
 
-    for (const index in products) {
-        const td = await products[index].$$('td')
+        for (const index in products) {
+            const td = await products[index].$$('td')
 
-        let a = await td[1].$('a')
-        const href = await (await a.getProperty('href')).jsonValue()
-        const productDescription = await (await a.getProperty('innerText')).jsonValue()
+            let a = await td[1].$('a')
+            console.log(td[1])
+            const href = await (await a.getProperty('href')).jsonValue()
+            const productDescription = await (await a.getProperty('innerText')).jsonValue()
 
-        a = await td[0].$('a')
-        const productKey = await (await a.getProperty('innerText')).jsonValue()
-        
-        console.log(href, productKey, productDescription)
-    }
+            a = await td[0].$('a')
+            const productKey = await (await a.getProperty('innerText')).jsonValue()
 
-    // products.forEach(async (product) => {
-    // const td = await product.$$('td')
-    // const a = await td[0].$('a')
-    // const href = await (await a.getProperty('href')).jsonValue()
-    // const article = await (await td[1].getProperty('innerText')).jsonValue()
-    // const linksSpan = await (await span.getProperty('innerText')).jsonValue()
-    //    console.log(td)
-    // });
-    // })
+            console.log(href, productKey, productDescription)
+        }
+        n += 1
+        isPars = products.length !== 0
+    } while (isPars)
 
     await browser.close()
-
-    // console.log(linksPage)
     console.log('End')
 })()
