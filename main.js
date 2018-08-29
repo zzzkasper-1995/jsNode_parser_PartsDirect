@@ -33,9 +33,8 @@ const userTo = 'zzz.kasper.zzz.1995@gmail.com';
     let n = 1
     do {
         const pageItem = await browser.newPage()
-        const params = `?tv=1&p=${n}`
+        const params = `?p=${n}`
         await pageItem.goto(item.href + params)
-        console.log(`n=${n} href='${item.href + params}'`)
         await sleep(1000)
 
         const products = await pageItem.$$('tbody > tr')
@@ -44,7 +43,6 @@ const userTo = 'zzz.kasper.zzz.1995@gmail.com';
             const td = await products[index].$$('td')
 
             let a = await td[1].$('a')
-            console.log(td[1])
             const href = await (await a.getProperty('href')).jsonValue()
             const productDescription = await (await a.getProperty('innerText')).jsonValue()
 
