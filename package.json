@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "alasql": "^0.4.5",
+    "cheerio": "^1.0.0-rc.2",
+    "needle": "^2.2.1",
+    "nodemailer": "^4.6.5",
+    "puppeteer": "^1.4.0",
+    "xlsx": "^0.13.0"
+  }
+}
