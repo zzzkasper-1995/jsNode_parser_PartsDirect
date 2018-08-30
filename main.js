@@ -6,16 +6,16 @@ const sleep = ms => new Promise(r => setTimeout(r, ms))
 
 // разделы меню сайта которые необходимо распарсить
 const URLS = [
-    'https://www.partsdirect.ru/notebooks/',
+    /*'https://www.partsdirect.ru/notebooks/',
     'https://www.partsdirect.ru/pads_parts/',
     'https://www.partsdirect.ru/smartphones/',
     'https://www.partsdirect.ru/apple_spareparts/',
-    'https://www.partsdirect.ru/pc/',
+    'https://www.partsdirect.ru/pc/',*/
 
-    'https://www.partsdirect.ru/for_soldering/',
+    /*'https://www.partsdirect.ru/for_soldering/',
     'https://www.partsdirect.ru/thermal_equipment/',
     'https://www.partsdirect.ru/chemicals_for_electronics/',
-    'https://www.partsdirect.ru/radio_components/',
+    'https://www.partsdirect.ru/radio_components/',*/
 
     'https://www.partsdirect.ru/hand_tools/',
     'https://www.partsdirect.ru/soldering_station/',
@@ -25,7 +25,7 @@ const URLS = [
 
 (async () => {
     logger.info('Start')
-    for (const URL of URLS) {
+    URLS.forEach(async (URL) => {
         try {
             // создаем новый виртуальный файл Excel
             const workbook = new Excel.Workbook()
@@ -34,7 +34,7 @@ const URLS = [
             const browser = await puppeteer.launch()
             const page = await browser.newPage()
             await page.goto(URL)
-            await sleep(2000)
+            await sleep(500)
 
             // считываем название раздела меню
             let nameFile = await page.$('main > h1')
@@ -46,9 +46,10 @@ const URLS = [
             const data = await page.$$('main > section.cats > ul > li > a')
             const linksPage = await Promise.all(data.map(async el => ({
                 href: await (await el.getProperty('href')).jsonValue(),
-                name: await (await el.getProperty('innerText')).jsonValue(),
+                name: await (await (await el.$('span')).getProperty('innerText')).jsonValue(),
             })))
 
+            console.log(linksPage)
             logger.info(nameFile)
 
             // цикл пробегает по подразделам
@@ -57,7 +58,7 @@ const URLS = [
                 const sheet = workbook.addWorksheet(item.name)
                 logger.info(item.name)
 
-                // бежим по cnhfybwfv подраздела
+                // бежим по страницам подраздела
                 let isPars = true
                 let n = 1
                 do {
@@ -67,7 +68,7 @@ const URLS = [
 
                         const pageItem = await browser.newPage()
                         await pageItem.goto(item.href + params)
-                        await sleep(1000)
+                        await sleep(500)
 
                         const products = await pageItem.$$('tbody > tr')
 
@@ -87,7 +88,7 @@ const URLS = [
 
                             // записываем полученную информацию в новую строку Excel страницы
                             sheet.addRow([href, productKey, productDescription, price])
-                            console.log(href, productKey, productDescription, price)
+                            //console.log(href, productKey, productDescription, price)
                         }
                         n += 1
                         isPars = products.length !== 0
@@ -95,7 +96,7 @@ const URLS = [
                         // закрываем страницу
                         await pageItem.close()
                     } catch (err) {
-                        logger.error(error)
+                        logger.error(err.message)
                     }
                 } while (isPars)
             }
@@ -110,9 +111,11 @@ const URLS = [
         } catch (err) {
             logger.error(err.message)
         }
-    }
+    });
     logger.info('End')
 })()
 
 //  в итоге у нас есть несколько xlsx файлов
 // в каждом из которых представлены товары по своему разделу
+
+
