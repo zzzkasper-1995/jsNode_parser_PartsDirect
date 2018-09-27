@@ -2,6 +2,10 @@ const puppeteer = require('puppeteer')
 const Excel = require('exceljs')
 const logger = require('./log')(module)
 
+/**
+ * функция отправляет программу в сон на указанное время
+ * @param {number} ms - время сна в милисекундах
+ */
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
 // разделы меню сайта которые необходимо распарсить
@@ -49,7 +53,6 @@ const URLS = [
                 name: await (await (await el.$('span')).getProperty('innerText')).jsonValue(),
             })))
 
-            console.log(linksPage)
             logger.info(nameFile)
 
             // цикл пробегает по подразделам
@@ -88,7 +91,6 @@ const URLS = [
 
                             // записываем полученную информацию в новую строку Excel страницы
                             sheet.addRow([href, productKey, productDescription, price])
-                            //console.log(href, productKey, productDescription, price)
                         }
                         n += 1
                         isPars = products.length !== 0
@@ -111,11 +113,9 @@ const URLS = [
         } catch (err) {
             logger.error(err.message)
         }
-    });
+    })
     logger.info('End')
 })()
 
 //  в итоге у нас есть несколько xlsx файлов
 // в каждом из которых представлены товары по своему разделу
-
-
